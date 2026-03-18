@@ -52,13 +52,13 @@ const TrainersDashboard = () => {
 
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-   useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         notificationRef.current &&
         !notificationRef.current.contains(event.target)
       ) {
-      setShowNotifications(false);
+        setShowNotifications(false);
       }
     };
 
@@ -144,22 +144,22 @@ const TrainersDashboard = () => {
 
     fetchTrainerType();
   }, []);
- useEffect(() => {
-  const q = query(collection(db, "helpcenter"));
+  useEffect(() => {
+    const q = query(collection(db, "helpcenter"));
 
-  const unsub = onSnapshot(q, (snap) => {
-    const data = snap.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      .sort((a, b) => b.reportedOn?.seconds - a.reportedOn?.seconds);
+    const unsub = onSnapshot(q, (snap) => {
+      const data = snap.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .sort((a, b) => b.reportedOn?.seconds - a.reportedOn?.seconds);
 
-    setNotifications(data);
-  });
+      setNotifications(data);
+    });
 
-  return () => unsub();
-}, []);
+    return () => unsub();
+  }, []);
 
   /* =============================
    🔥 FETCH STUDENTS
@@ -284,7 +284,7 @@ const TrainersDashboard = () => {
     if (item === "Payment & Subscription")
       return setView("PaymentsSubscriptionPage");
     if (item === "terms") return setView("terms");
-if (item === "privacy") return setView("privacy");
+    if (item === "privacy") return setView("privacy");
 
     setView("notConnected");
   };
@@ -347,7 +347,12 @@ if (item === "privacy") return setView("privacy");
       return <MyAccountPage setActiveMenu={handleMenuClick} />;
     if (view === "Family") return <Family />;
     if (view === "complaintHistory")
-      return <ComplaintHistory ticketId={selectedTicket} />;
+      return (
+        <ComplaintHistory
+          ticketId={selectedTicket}
+          setView={setView}   // ✅ ADD THIS
+        />
+      );
     if (view === "PaymentsSubscriptionPage")
       return <PaymentsSubscriptionPage />;
     if (view === "notConnected") {
@@ -370,10 +375,10 @@ if (item === "privacy") return setView("privacy");
         <div className="flex items-center mb-4 w-full">
           <div className="flex items-center bg-gray-100 border border-gray-300 rounded-full px-5 py-2 w-full max-w-md">
             <img
-  src="/search-icon.png"
-  alt="search"
-  className="w-4 h-4 mr-2"
-/>
+              src="/search-icon.png"
+              alt="search"
+              className="w-4 h-4 mr-2"
+            />
             <input
               type="text"
               placeholder={`Search ${trainerLabel.toLowerCase()} by name...`}
@@ -386,22 +391,22 @@ if (item === "privacy") return setView("privacy");
 
             {/* 🔔 Notification Bell */}
             <div className="relative">
-<button
-  onClick={() => {
-    const newState = !showNotifications;
-    setShowNotifications(newState);
+              <button
+                onClick={() => {
+                  const newState = !showNotifications;
+                  setShowNotifications(newState);
 
-    if (newState) {
-      markAllSeen();
-    }
-  }}
-  className="relative flex items-center justify-center mt-1 hover:scale-110 transition"
->
-<img
-  src="/notification-icon.png"
-  alt="notifications"
-  className="w-10 h-10 object-contain"
-/>
+                  if (newState) {
+                    markAllSeen();
+                  }
+                }}
+                className="relative flex items-center justify-center mt-1 hover:scale-110 transition"
+              >
+                <img
+                  src="/notification-icon.png"
+                  alt="notifications"
+                  className="w-10 h-10 object-contain"
+                />
 
                 {unreadNotifications.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
@@ -410,38 +415,38 @@ if (item === "privacy") return setView("privacy");
                 )}
               </button>
 
-            {showNotifications && (
-  <div
-    ref={notificationRef}
-    className="absolute right-0 mt-4 w-80 bg-white border shadow-lg rounded-lg z-50"
-  >
-    <div className="p-3 border-b font-semibold text-black">
-      Support Tickets
-    </div>
+              {showNotifications && (
+                <div
+                  ref={notificationRef}
+                  className="absolute right-0 mt-4 w-80 bg-white border shadow-lg rounded-lg z-50"
+                >
+                  <div className="p-3 border-b font-semibold text-black">
+                    Support Tickets
+                  </div>
 
-    <div className="max-h-60 overflow-y-auto p-2">
-      {notifications.length === 0 ? (
-        <p className="text-gray-500 text-sm">No notifications</p>
-      ) : (
-        notifications.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => {
-              setSelectedTicket(item.id);
-              setView("complaintHistory");
-            }}
-            className="border-b p-3 text-sm hover:bg-gray-100 cursor-pointer"
-          >
-            <p className="font-medium">{item.issue}</p>
-            <p className="text-gray-500 text-xs">
-              Ticket: {item.ticketId}
-            </p>
-          </div>
-        ))
-      )}
-    </div>
-  </div>
-)}
+                  <div className="max-h-60 overflow-y-auto p-2">
+                    {notifications.length === 0 ? (
+                      <p className="text-gray-500 text-sm">No notifications</p>
+                    ) : (
+                      notifications.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => {
+                            setSelectedTicket(item.id);
+                            setView("complaintHistory");
+                          }}
+                          className="border-b p-3 text-sm hover:bg-gray-100 cursor-pointer"
+                        >
+                          <p className="font-medium">{item.issue}</p>
+                          <p className="text-gray-500 text-xs">
+                            Ticket: {item.ticketId}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             {/* Calendar */}
             <input
@@ -569,7 +574,7 @@ if (item === "privacy") return setView("privacy");
           </button>
 
           <button
-           onClick={() => handleMenuClick("privacy")}
+            onClick={() => handleMenuClick("privacy")}
             className={`block w-full text-left py-2 ${activeMenu === "Privacy Policy"
               ? "text-orange-500 font-semibold"
               : "text-white hover:text-orange-400"

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
-const ComplaintHistory = ({ ticketId }) => {
+const ComplaintHistory = ({ ticketId, setView }) => {
   const [ticket, setTicket] = useState(null);
   const [status, setStatus] = useState("");
 const [resolvedDate, setResolvedDate] = useState("");
@@ -39,8 +39,18 @@ if (data.resolvedOn) {
 
   if (!ticket) return <p>Loading...</p>;
 
- return (
-  <div className="p-6 flex justify-center mt-6">
+  return (
+  <div className="p-6 mt-6">
+
+    {/* 🔙 BACK BUTTON */}
+    <button
+      onClick={() => setView("Home")}
+      className="mb-4 flex items-center gap-2 text-orange-600 font-semibold hover:gap-3 transition-all"
+    >
+      ← Back
+    </button>
+
+    <div className="flex justify-center">
 
     <div className="bg-white shadow-lg rounded-lg w-full max-w-3xl p-6">
 
@@ -103,7 +113,7 @@ if (data.resolvedOn) {
       </div>
 
     </div>
-
+</div>
   </div>
 );
 };
