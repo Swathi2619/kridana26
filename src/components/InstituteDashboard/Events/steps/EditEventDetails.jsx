@@ -85,8 +85,8 @@ export default function EditEventDetails({ eventId, goBack, setActiveMenu }) {
       email: data.organizer?.email || "",
       emergencyNumber: data.organizer?.emergencyContact || "",
       documents: data.participants?.requiredDocument || "",
-      startDate: data.schedule?.startDate || "",
-      endDate: data.schedule?.endDate || "",
+      startDate: formatDate(data.schedule?.startDate),
+      endDate: formatDate(data.schedule?.endDate),
       timings: data.schedule?.startTime || "",
       address: data.schedule?.address || "",
     });
@@ -121,6 +121,8 @@ export default function EditEventDetails({ eventId, goBack, setActiveMenu }) {
 
         schedule: {
           address: form.address,
+          startDate: form.startDate,
+          endDate: form.endDate,
         },
 
         pricing: [
@@ -147,6 +149,20 @@ export default function EditEventDetails({ eventId, goBack, setActiveMenu }) {
 
   const removeManagement = (index) => {
     setManagement(management.filter((_, i) => i !== index));
+  };
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    // correct format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+
+    // dd-mm-yyyy → convert
+    if (/^\d{2}-\d{2}-\d{4}$/.test(date)) {
+      const [dd, mm, yyyy] = date.split("-");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    return ""; // reject invalid like 222222
   };
   const inputStyle =
     "w-full border border-orange-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500";
@@ -311,6 +327,8 @@ export default function EditEventDetails({ eventId, goBack, setActiveMenu }) {
               <div className="w-full">
                 <input
                   type="date"
+                  min="1900-01-01"
+                  max="2099-12-31"
                   value={form.startDate || ""}
                   onChange={(e) =>
                     setForm({ ...form, startDate: e.target.value })
@@ -322,10 +340,16 @@ export default function EditEventDetails({ eventId, goBack, setActiveMenu }) {
               <div className="w-full">
                 <input
                   type="date"
+                  min="1900-01-01"
+                  max="2099-12-31"
                   value={form.endDate || ""}
-                  onChange={(e) =>
-                    setForm({ ...form, endDate: e.target.value })
-                  }
+                  onChange={(e) => {
+                    if (form.startDate && e.target.value < form.startDate) {
+                      alert("End date cannot be before start date");
+                      return;
+                    }
+                    setForm({ ...form, endDate: e.target.value });
+                  }}
                   className={inputStyle}
                 />
               </div>

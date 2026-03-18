@@ -643,12 +643,7 @@ ${graphData
           </div>
         </div>
       </div>
-      <button
-        onClick={downloadPDFReport}
-        className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg"
-      >
-        Download Report
-      </button>
+
       {/* WORKFORCE */}
       <div className="bg-gray-50 border rounded-xl p-6 mt-10 shadow-sm">
         <h2 className="text-2xl font-bold mb-6">Workforce & Clients Metrics</h2>

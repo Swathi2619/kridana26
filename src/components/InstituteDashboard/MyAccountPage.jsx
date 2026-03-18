@@ -426,6 +426,18 @@ const MyAccountPage = ({ setActiveMenu }) => {
     }
   };
 
+  // Capitalize each word (Ravi Kumar)
+const capitalizeWords = (value) => {
+  return value
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+// Allow only letters + space
+const onlyAlphabets = (value) => {
+  return value.replace(/[^A-Za-z\s]/g, "");
+};
+
   const handleTrainerImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file || !editingTrainer) return;
@@ -1126,15 +1138,15 @@ const MyAccountPage = ({ setActiveMenu }) => {
                       </label>
                       <input
                         value={editingTrainer?.firstName || ""}
-                        onChange={(e) =>
-                          setEditingTrainer({
-                            ...editingTrainer,
-                            firstName: e.target.value.replace(
-                              /[^A-Za-z ]/g,
-                              "",
-                            ),
-                          })
-                        }
+onChange={(e) => {
+  let value = onlyAlphabets(e.target.value);
+  value = capitalizeWords(value);
+
+  setEditingTrainer({
+    ...editingTrainer,
+    firstName: value,
+  });
+}}
                         className="w-full border rounded-lg px-3 py-2 focus:outline-none"
                       />
                     </div>
@@ -1145,17 +1157,15 @@ const MyAccountPage = ({ setActiveMenu }) => {
                       </label>
                       <input
                         value={editingTrainer?.lastName || ""}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(
-                            /[^A-Za-z ]/g,
-                            "",
-                          );
+onChange={(e) => {
+  let value = onlyAlphabets(e.target.value);
+  value = capitalizeWords(value);
 
-                          setEditingTrainer({
-                            ...editingTrainer,
-                            lastName: value,
-                          });
-                        }}
+  setEditingTrainer({
+    ...editingTrainer,
+    lastName: value,
+  });
+}}
                         className="w-full border rounded-lg px-3 py-2 focus:outline-none"
                       />
                     </div>
@@ -1229,16 +1239,15 @@ const MyAccountPage = ({ setActiveMenu }) => {
                       </label>
                       <input
                         value={editingTrainer?.designation || ""}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(
-                            /[^A-Za-z ]/g,
-                            "",
-                          );
-                          setEditingTrainer({
-                            ...editingTrainer,
-                            designation: value,
-                          });
-                        }}
+onChange={(e) => {
+  let value = onlyAlphabets(e.target.value);
+  value = capitalizeWords(value);
+
+  setEditingTrainer({
+    ...editingTrainer,
+    designation: value,
+  });
+}}
                         className="w-full border rounded-lg px-3 py-2 focus:outline-none"
                       />
                     </div>
@@ -1358,48 +1367,59 @@ const MyAccountPage = ({ setActiveMenu }) => {
                     <input
                       placeholder="Account Name"
                       value={editingTrainer?.accountName || ""}
-                      onChange={(e) =>
-                        setEditingTrainer({
-                          ...editingTrainer,
-                          accountName: e.target.value,
-                        })
-                      }
+onChange={(e) => {
+  let value = onlyAlphabets(e.target.value);
+  value = capitalizeWords(value);
+
+  setEditingTrainer({
+    ...editingTrainer,
+    accountName: value,
+  });
+}}
                       className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-400"
                     />
 
                     <input
                       placeholder="Account Number"
                       value={editingTrainer?.accountNumber || ""}
-                      onChange={(e) =>
-                        setEditingTrainer({
-                          ...editingTrainer,
-                          accountNumber: e.target.value,
-                        })
-                      }
+ onChange={(e) => {
+  const value = e.target.value.replace(/\D/g, "");
+
+  setEditingTrainer({
+    ...editingTrainer,
+    accountNumber: value,
+  });
+}}
                       className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-400"
                     />
 
                     <input
                       placeholder="Bank Name"
                       value={editingTrainer?.bankName || ""}
-                      onChange={(e) =>
-                        setEditingTrainer({
-                          ...editingTrainer,
-                          bankName: e.target.value,
-                        })
-                      }
+onChange={(e) => {
+  let value = onlyAlphabets(e.target.value);
+  value = capitalizeWords(value);
+
+  setEditingTrainer({
+    ...editingTrainer,
+    bankName: value,
+  });
+}}
                       className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-400"
                     />
 
                     <input
                       placeholder="IFSC Code"
                       value={editingTrainer?.ifscCode || ""}
-                      onChange={(e) =>
-                        setEditingTrainer({
-                          ...editingTrainer,
-                          ifscCode: e.target.value,
-                        })
-                      }
+onChange={(e) => {
+  let value = e.target.value.replace(/[^A-Za-z0-9]/g, "");
+  value = value.toUpperCase();
+
+  setEditingTrainer({
+    ...editingTrainer,
+    ifscCode: value,
+  });
+}}
                       className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-400"
                     />
 
@@ -1955,12 +1975,15 @@ const MyAccountPage = ({ setActiveMenu }) => {
                     </label>
                     <input
                       value={editingStudent?.firstName || ""}
-                      onChange={(e) =>
-                        setEditingStudent({
-                          ...editingStudent,
-                          firstName: e.target.value.replace(/[^A-Za-z ]/g, ""),
-                        })
-                      }
+onChange={(e) => {
+  let value = onlyAlphabets(e.target.value);
+  value = capitalizeWords(value);
+
+  setEditingStudent({
+    ...editingStudent,
+    firstName: value,
+  });
+}}
                       className="w-full border rounded-lg px-3 py-2 focus:outline-none"
                     />
                   </div>
@@ -1971,13 +1994,15 @@ const MyAccountPage = ({ setActiveMenu }) => {
                     </label>
                     <input
                       value={editingStudent?.lastName || ""}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/[^A-Za-z ]/g, "");
-                        setEditingStudent({
-                          ...editingStudent,
-                          lastName: value,
-                        });
-                      }}
+onChange={(e) => {
+  let value = onlyAlphabets(e.target.value);
+  value = capitalizeWords(value);
+
+  setEditingStudent({
+    ...editingStudent,
+    lastName: value,
+  });
+}}
                       className="w-full border rounded-lg px-3 py-2 focus:outline-none"
                     />
                   </div>

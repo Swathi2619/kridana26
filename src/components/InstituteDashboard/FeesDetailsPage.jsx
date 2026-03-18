@@ -84,7 +84,16 @@ const FeesDetailsPage = () => {
     );
 
     return onSnapshot(q, (snap) => {
-      setStudents(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const list = snap.docs
+  .map((d) => ({ id: d.id, ...d.data() }))
+  .sort((a, b) => {
+    const nameA = `${a.firstName || ""} ${a.lastName || ""}`.toLowerCase();
+    const nameB = `${b.firstName || ""} ${b.lastName || ""}`.toLowerCase();
+
+    return nameA.localeCompare(nameB);
+  });
+
+setStudents(list);
     });
   }, [instituteId]);
 

@@ -801,10 +801,16 @@ Password: ${DEFAULT_PASSWORD}`,
               <input
                 className={inputClass}
                 value={formData.lastName}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^A-Za-z.\s]/g, "");
-                  setFormData((prev) => ({ ...prev, lastName: value }));
-                }}
+onChange={(e) => {
+  let value = e.target.value.replace(/[^A-Za-z.\s]/g, "");
+
+  // ✅ Capitalize first letter
+  if (value.length > 0) {
+    value = value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  setFormData((prev) => ({ ...prev, lastName: value }));
+}}
               />
               {errors.lastName && (
                 <span className="text-red-500 text-xs mt-1">
@@ -1199,19 +1205,21 @@ Password: ${DEFAULT_PASSWORD}`,
               <label className="text-sm font-semibold mb-2">
                 Branch Number<span className="text-red-500">*</span>
               </label>
-
-              <input
-                type="text"
-                className={inputClass}
-                value={formData.branch}
-                placeholder="Enter branch number"
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    branch: e.target.value,
-                  }))
-                }
-              />
+<input
+  type="text"
+  inputMode="numeric"
+  pattern="[0-9]*"
+  className={inputClass}
+  value={formData.branch}
+  placeholder="Enter branch number"
+  onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, ""); // 🔒 remove non-numbers
+    setFormData((prev) => ({
+      ...prev,
+      branch: value,
+    }));
+  }}
+/>
 
               {errors.branch && (
                 <span className="text-red-500 text-xs mt-1">

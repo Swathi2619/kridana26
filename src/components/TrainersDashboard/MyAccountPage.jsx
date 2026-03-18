@@ -935,12 +935,18 @@ const removeAadharImage = (index) => {
                     <label className="text-sm font-medium">Role*</label>
                     <input
                       value={editingTrainer.designation}
-                      onChange={(e) =>
-                        setEditingTrainer({
-                          ...editingTrainer,
-                          designation: e.target.value,
-                        })
-                      }
+                     onChange={(e) => {
+  let value = e.target.value.replace(/[^A-Za-z ]/g, "");
+
+  if (value.length > 0) {
+    value = value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  setEditingTrainer({
+    ...editingTrainer,
+    designation: value,
+  });
+}}
                       className="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
                     />
                   </div>
@@ -1505,16 +1511,19 @@ const removeAadharImage = (index) => {
                         <input
                           className="w-full border border-gray-300 rounded-lg px-3 py-2"
                           value={editingStudent.firstName || ""}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(
-                              /[^A-Za-z ]/g,
-                              "",
-                            );
-                            setEditingStudent({
-                              ...editingStudent,
-                              firstName: value,
-                            });
-                          }}
+                         onChange={(e) => {
+  let value = e.target.value.replace(/[^A-Za-z ]/g, "");
+
+  // ✅ Capitalize first letter
+  if (value.length > 0) {
+    value = value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  setEditingStudent({
+    ...editingStudent,
+    firstName: value,
+  });
+}}
                         />
                       </div>
 
@@ -1525,16 +1534,19 @@ const removeAadharImage = (index) => {
                         <input
                           className="w-full border border-gray-300 rounded-lg px-3 py-2"
                           value={editingStudent.lastName || ""}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(
-                              /[^A-Za-z ]/g,
-                              "",
-                            );
-                            setEditingStudent({
-                              ...editingStudent,
-                              lastName: value,
-                            });
-                          }}
+                         onChange={(e) => {
+  let value = e.target.value.replace(/[^A-Za-z ]/g, "");
+
+  // ✅ Capitalize first letter
+  if (value.length > 0) {
+    value = value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  setEditingStudent({
+    ...editingStudent,
+    lastName: value,
+  });
+}}
                         />
                       </div>
 

@@ -185,45 +185,56 @@ const CreateFamilyPage = () => {
           className="border p-3 rounded"
         />
 
-<input
-  placeholder="Father Name"
-  value={formData.fatherName}
-  onChange={(e) => {
-    const value = e.target.value.replace(/[^A-Za-z\s]/g, "");
-    setFormData({
-      ...formData,
-      fatherName: value,
-    });
-  }}
-  className="border p-3 rounded"
-/>
+        <input
+          placeholder="Father Name"
+          value={formData.fatherName}
+          onChange={(e) => {
+            let value = e.target.value.replace(/[^A-Za-z\s]/g, "");
 
-<input
-  placeholder="Mother Name"
-  value={formData.motherName}
-  onChange={(e) => {
-    const value = e.target.value.replace(/[^A-Za-z\s]/g, "");
-    setFormData({
-      ...formData,
-      motherName: value,
-    });
-  }}
-  className="border p-3 rounded"
-/>
+            // ✅ Capitalize first letter
+            if (value.length > 0) {
+              value = value.charAt(0).toUpperCase() + value.slice(1);
+            }
 
-<input
-  placeholder="Phone"
-  maxLength={10}
-  value={formData.phone}
-  onChange={(e) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-    setFormData({
-      ...formData,
-      phone: value,
-    });
-  }}
-  className="border p-3 rounded"
-/>
+            setFormData({
+              ...formData,
+              fatherName: value,
+            });
+          }}
+          className="border p-3 rounded"
+        />
+        <input
+          placeholder="Mother Name"
+          value={formData.motherName}
+          onChange={(e) => {
+            let value = e.target.value.replace(/[^A-Za-z\s]/g, "");
+
+            // ✅ Capitalize first letter
+            if (value.length > 0) {
+              value = value.charAt(0).toUpperCase() + value.slice(1);
+            }
+
+            setFormData({
+              ...formData,
+              motherName: value,
+            });
+          }}
+          className="border p-3 rounded"
+        />
+
+        <input
+          placeholder="Phone"
+          maxLength={10}
+          value={formData.phone}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+            setFormData({
+              ...formData,
+              phone: value,
+            });
+          }}
+          className="border p-3 rounded"
+        />
       </div>
 
       {/* STUDENTS */}

@@ -436,21 +436,21 @@ export default function StudentPerformanceReport() {
   const filterByMonth = () => {
     console.log("[FILTER BY MONTH] START");
     const month = dayjs(selectedMonth);
-const filtered = [...students]
-  .sort((a, b) =>
-    (a.firstName || "").localeCompare(b.firstName || "")
-  )
-  .filter((s) => {
-      if (!s.createdAt) {
-        console.log("[NO CREATEDAT]", s.id);
-        return false;
-      }
-      const joinDate = dayjs(s.createdAt.toDate());
-      const valid =
-        joinDate.isSame(month, "month") || joinDate.isBefore(month, "month");
-      console.log("[MONTH FILTER]", s.id, joinDate.format(), valid);
-      return valid;
-    });
+    const filtered = [...students]
+      .sort((a, b) =>
+        (a.firstName || "").localeCompare(b.firstName || "")
+      )
+      .filter((s) => {
+        if (!s.createdAt) {
+          console.log("[NO CREATEDAT]", s.id);
+          return false;
+        }
+        const joinDate = dayjs(s.createdAt.toDate());
+        const valid =
+          joinDate.isSame(month, "month") || joinDate.isBefore(month, "month");
+        console.log("[MONTH FILTER]", s.id, joinDate.format(), valid);
+        return valid;
+      });
     console.log("[FILTERED STUDENTS]", filtered);
     setFilteredStudents(filtered);
   };
@@ -942,9 +942,8 @@ const filtered = [...students]
 
             <ChevronDown
               size={18}
-              className={`ml-2 transition-transform ${
-                showCategoryDropdown ? "rotate-180" : ""
-              }`}
+              className={`ml-2 transition-transform ${showCategoryDropdown ? "rotate-180" : ""
+                }`}
             />
           </button>
 
@@ -979,9 +978,8 @@ const filtered = [...students]
               selectedCategory &&
               setShowSubCategoryDropdown(!showSubCategoryDropdown)
             }
-            className={`${inputClass} flex items-center justify-between text-left ${
-              !selectedCategory && "bg-gray-100 cursor-not-allowed"
-            }`}
+            className={`${inputClass} flex items-center justify-between text-left ${!selectedCategory && "bg-gray-100 cursor-not-allowed"
+              }`}
           >
             <span>
               {selectedSubCategory
@@ -993,9 +991,8 @@ const filtered = [...students]
 
             <ChevronDown
               size={18}
-              className={`ml-2 transition-transform ${
-                showSubCategoryDropdown ? "rotate-180" : ""
-              }`}
+              className={`ml-2 transition-transform ${showSubCategoryDropdown ? "rotate-180" : ""
+                }`}
             />
           </button>
 
@@ -1057,10 +1054,10 @@ const filtered = [...students]
                 className="p-2 border border-orange-300 rounded-lg"
                 value={manualAttendance.total}
                 onChange={(e) =>
-                  setManualAttendance({
-                    ...manualAttendance,
+                  setManualAttendance((prev) => ({
+                    ...prev,
                     total: e.target.value,
-                  })
+                  }))
                 }
               />
 
@@ -1070,10 +1067,10 @@ const filtered = [...students]
                 className="p-2 border border-orange-300 rounded-lg"
                 value={manualAttendance.present}
                 onChange={(e) =>
-                  setManualAttendance({
-                    ...manualAttendance,
+                  setManualAttendance((prev) => ({
+                    ...prev,
                     present: e.target.value,
-                  })
+                  }))
                 }
               />
 
@@ -1162,15 +1159,20 @@ const filtered = [...students]
                         className="w-full mt-2 p-2 border border-orange-300 rounded-lg bg-white"
                         placeholder="Value"
                         value={physicalFitness[item.toLowerCase()]?.value || ""}
-                        onChange={(e) =>
-                          setPhysicalFitness((prev) => ({
-                            ...prev,
-                            [item.toLowerCase()]: {
-                              ...prev[item.toLowerCase()],
-                              value: e.target.value,
-                            },
-                          }))
-                        }
+                        onChange={(e) => {
+                          let value = e.target.value;
+
+                          // ✅ Allow only numbers + decimal (3, 2.5)
+                          if (/^\d*\.?\d*$/.test(value)) {
+                            setPhysicalFitness((prev) => ({
+                              ...prev,
+                              [item.toLowerCase()]: {
+                                ...prev[item.toLowerCase()],
+                                value: value,
+                              },
+                            }));
+                          }
+                        }}
                       />
 
                       <input
@@ -1204,11 +1206,10 @@ const filtered = [...students]
           onClick={handleSave}
           disabled={savingReport}
           className={`px-6 py-2 rounded-lg font-semibold w-full sm:w-auto transition-all
-    ${
-      savingReport
-        ? "bg-gray-400 text-white cursor-not-allowed"
-        : "bg-orange-500 text-white hover:bg-orange-600"
-    }
+    ${savingReport
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-orange-500 text-white hover:bg-orange-600"
+            }
   `}
         >
           {savingReport ? "Saving..." : "Save"}

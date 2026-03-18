@@ -12,12 +12,17 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
   const auth = getAuth();
 
   const handleChange = (field, value) => {
+    // ❌ reject invalid year like 222222
+    if (value && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       schedule: {
         ...prev.schedule,
         [field]: value,
-      },
+      },  
     }));
   };
 
@@ -95,6 +100,8 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
           <input
             type="date"
             className={inputStyle}
+            min="1900-01-01"
+            max="2099-12-31"
             value={formData?.schedule?.startDate || ""}
             onChange={(e) => handleChange("startDate", e.target.value)}
           />
@@ -106,6 +113,8 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
           <input
             type="date"
             className={inputStyle}
+            min="1900-01-01"
+            max="2099-12-31"
             value={formData?.schedule?.endDate || ""}
             onChange={(e) => handleChange("endDate", e.target.value)}
           />
@@ -151,6 +160,8 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
           <input
             type="date"
             className={inputStyle}
+            min="1900-01-01"
+            max="2099-12-31"
             value={formData?.schedule?.registrationDeadline || ""}
             onChange={(e) =>
               handleChange("registrationDeadline", e.target.value)

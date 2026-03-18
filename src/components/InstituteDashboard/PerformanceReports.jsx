@@ -481,10 +481,8 @@ export default function StudentPerformanceReport() {
       const start = dayjs(selectedMonth).startOf("month").format("YYYY-MM-DD");
       const end = dayjs(selectedMonth).endOf("month").format("YYYY-MM-DD");
 
-      const colPath = `institutes/${user.uid}/attendance`;
-
-      const q = query(
-        collection(db, colPath),
+const q = query(
+  collection(db, "institutes", user.uid, "attendance"),
         where("studentId", "==", selectedStudent),
         where("category", "==", selectedCategory),
         where("subCategory", "==", selectedSubCategory),
@@ -1175,15 +1173,20 @@ export default function StudentPerformanceReport() {
                         className="w-full mt-2 p-2 border border-orange-300 rounded-lg bg-white"
                         placeholder="Value"
                         value={physicalFitness[item.toLowerCase()]?.value || ""}
-                        onChange={(e) =>
-                          setPhysicalFitness((prev) => ({
-                            ...prev,
-                            [item.toLowerCase()]: {
-                              ...prev[item.toLowerCase()],
-                              value: e.target.value,
-                            },
-                          }))
-                        }
+onChange={(e) => {
+  let value = e.target.value;
+
+  // ✅ allow only numbers and one dot
+  if (/^\d*\.?\d*$/.test(value)) {
+    setPhysicalFitness((prev) => ({
+      ...prev,
+      [item.toLowerCase()]: {
+        ...prev[item.toLowerCase()],
+        value,
+      },
+    }));
+  }
+}}
                       />
                       ...
                       <input

@@ -785,7 +785,13 @@ Password: ${DEFAULT_PASSWORD}`,
                 className={inputClass}
                 value={formData.lastName}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/[^A-Za-z.\s]/g, "");
+                  let value = e.target.value.replace(/[^A-Za-z.\s]/g, "");
+
+                  // SAME LOGIC AS FIRST NAME
+                  if (value.length > 0) {
+                    value = value.charAt(0).toUpperCase() + value.slice(1);
+                  }
+
                   setFormData((prev) => ({ ...prev, lastName: value }));
                 }}
               />

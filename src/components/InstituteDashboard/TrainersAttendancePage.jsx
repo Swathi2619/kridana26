@@ -24,6 +24,18 @@ const absenceReasons = [
   "Other",
 ];
 
+const formatName = (value) => {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z.\s]/g, "")
+    .split(" ")
+    .map((word) =>
+      word ? word.charAt(0).toUpperCase() + word.slice(1) : ""
+    )
+    .join(" ");
+};
+
+
 const EmployeeAttendancePage = () => {
   const handleAdd = () => {
     setShowAddModal(true);
@@ -210,6 +222,7 @@ const filteredEmployees = useMemo(() => {
         return;
       }
     }
+
 
     const promises = Object.values(draftAttendance).map((rec) =>
       setDoc(
@@ -406,27 +419,27 @@ ${selectedEmployee?.uid === emp.uid
               className="border w-full p-2 rounded"
               placeholder="First Name"
               value={addData.firstName}
-              onChange={(e) =>
-                setAddData({ ...addData, firstName: e.target.value })
-              }
+onChange={(e) =>
+  setAddData({ ...addData, firstName: formatName(e.target.value) })
+}
             />
 
             <input
               className="border w-full p-2 rounded"
               placeholder="Last Name"
               value={addData.lastName}
-              onChange={(e) =>
-                setAddData({ ...addData, lastName: e.target.value })
-              }
+onChange={(e) =>
+  setAddData({ ...addData, lastName: formatName(e.target.value) })
+}
             />
 
             <input
               className="border w-full p-2 rounded"
               placeholder="Designation"
               value={addData.designation}
-              onChange={(e) =>
-                setAddData({ ...addData, designation: e.target.value })
-              }
+onChange={(e) =>
+  setAddData({ ...addData, designation: formatName(e.target.value) })
+}
             />
 
             <div className="flex justify-end gap-3">
@@ -454,27 +467,27 @@ ${selectedEmployee?.uid === emp.uid
               className="border w-full p-2 rounded"
               placeholder="First Name"
               value={editData.firstName}
-              onChange={(e) =>
-                setEditData({ ...editData, firstName: e.target.value })
-              }
+onChange={(e) =>
+  setEditData({ ...editData, firstName: formatName(e.target.value) })
+}
             />
 
             <input
               className="border w-full p-2 rounded"
               placeholder="Last Name"
               value={editData.lastName}
-              onChange={(e) =>
-                setEditData({ ...editData, lastName: e.target.value })
-              }
+onChange={(e) =>
+  setEditData({ ...editData, lastName: formatName(e.target.value) })
+}
             />
 
             <input
               className="border w-full p-2 rounded"
               placeholder="Designation"
               value={editData.designation}
-              onChange={(e) =>
-                setEditData({ ...editData, designation: e.target.value })
-              }
+onChange={(e) =>
+  setEditData({ ...editData, designation: formatName(e.target.value) })
+}
             />
 
             <div className="flex justify-end gap-3">

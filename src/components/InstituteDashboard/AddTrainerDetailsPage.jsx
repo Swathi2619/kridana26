@@ -9,7 +9,6 @@ import {
 } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-
 import { db, secondaryAuth } from "../../firebase";
 import { useAuth } from "../../context/AuthContext";
 import { User, ChevronDown } from "lucide-react";
@@ -473,6 +472,18 @@ export default function AddTrainerDetailsPage() {
     e.target.value = null;
   };
 
+
+  const formatName = (value) => {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z.\s]/g, "") // allow letters + dot + space
+    .split(" ")
+    .map((word) =>
+      word ? word.charAt(0).toUpperCase() + word.slice(1) : ""
+    )
+    .join(" ");
+};
+
   /* -------------------- VALIDATION -------------------- */
   const validateStep = () => {
     let newErrors = {};
@@ -758,10 +769,12 @@ export default function AddTrainerDetailsPage() {
               <input
                 className={inputClass}
                 value={formData.lastName}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^A-Za-z.\s]/g, "");
-                  setFormData({ ...formData, lastName: value });
-                }}
+onChange={(e) =>
+  setFormData({
+    ...formData,
+    lastName: formatName(e.target.value),
+  })
+}
               />
               {errors.lastName && (
                 <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
@@ -803,10 +816,12 @@ export default function AddTrainerDetailsPage() {
               <input
                 className={inputClass}
                 value={formData.designation}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^A-Za-z.\s]/g, "");
-                  setFormData({ ...formData, designation: value });
-                }}
+onChange={(e) =>
+  setFormData({
+    ...formData,
+    designation: formatName(e.target.value),
+  })
+}
               />
               {errors.designation && (
                 <p className="text-red-500 text-xs mt-1">

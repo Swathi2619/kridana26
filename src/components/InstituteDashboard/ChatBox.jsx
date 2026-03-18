@@ -592,54 +592,65 @@ const ChatBox = () => {
               className="cursor-pointer"
             />
 
-            {showMenu && (
-              <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-md border z-50">
-                <button
-                  onClick={() => {
-                    setScreen("createGroup");
-                    setShowMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                >
-                  ➕ Create Group
-                </button>
+           {showMenu && (
+  <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-xl border z-50 overflow-hidden">
 
-                {activeChat?.type === "group" && (
-                  <>
-                    <button
-                      onClick={() => {
-                        setScreen("participants");
-                        setShowMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                    >
-                      👥 View Participants
-                    </button>
+    {/* CREATE GROUP */}
+   <button
+  onClick={() => {
+    setScreen("createGroup");
+    setShowMenu(false);
+  }}
+  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 text-sm"
+>
+  <span className="w-5 h-5 flex items-center justify-center text-black text-[24px] font-bold leading-none">
+  +
+</span>
+  <span>Create Group</span>
+</button>
 
-                    {isAdmin() && (
-                      <>
-                        <button
-                          onClick={() => {
-                            setRenameValue(activeChatName);
-                            setShowMenu(false);
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                        >
-                          ✏ Rename Group
-                        </button>
+    {activeChat?.type === "group" && (
+      <>
+        {/* VIEW PARTICIPANTS */}
+        <button
+          onClick={() => {
+            setScreen("participants");
+            setShowMenu(false);
+          }}
+          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 text-sm"
+        >
+        <img src="/contact.png" className="w-4 h-4 object-contain" />
+          <span>View Participants</span>
+        </button>
 
-                        <button
-                          onClick={deleteGroup}
-                          className="w-full text-left px-4 py-2 hover:bg-red-50 text-sm text-red-600"
-                        >
-                          🗑 Delete Group
-                        </button>
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
+        {isAdmin() && (
+          <>
+            {/* RENAME GROUP */}
+            <button
+              onClick={() => {
+                setRenameValue(activeChatName);
+                setShowMenu(false);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 text-sm"
+            >
+              <img src="/edit-icon.png" className="w-5 h-5" />
+              <span>Rename Group</span>
+            </button>
+
+            {/* DELETE GROUP */}
+            <button
+              onClick={deleteGroup}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-sm text-red-600"
+            >
+              <img src="/delete-icon.png" className="w-5 h-5" />
+              <span>Delete Group</span>
+            </button>
+          </>
+        )}
+      </>
+    )}
+  </div>
+)}
           </div>
         </div>
 

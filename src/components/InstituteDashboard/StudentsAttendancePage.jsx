@@ -78,8 +78,16 @@ const StudentsAttendancePage = () => {
     );
 
     return onSnapshot(q, (snap) => {
-      const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
-      setStudents(list);
+const list = snap.docs
+  .map((d) => ({ uid: d.id, ...d.data() }))
+  .sort((a, b) => {
+    const nameA = `${a.firstName || ""} ${a.lastName || ""}`.toLowerCase();
+    const nameB = `${b.firstName || ""} ${b.lastName || ""}`.toLowerCase();
+
+    return nameA.localeCompare(nameB);
+  });
+
+setStudents(list);
     });
   }, [user, institute]);
 
@@ -169,23 +177,25 @@ const StudentsAttendancePage = () => {
     selectedBranch,
   ]);
   // Summary
-  useEffect(() => {
-    const total = filteredStudents.length;
-    let present = 0;
-    let absent = 0;
+useEffect(() => {
+  const total = filteredStudents.length;
+  let present = 0;
+  let absent = 0;
 
-    filteredStudents.forEach((student) => {
-      const status = draftAttendance[student.uid];
-      if (status === "present") present++;
-      if (status === "absent") absent++;
-    });
+  filteredStudents.forEach((student) => {
+    const key = `${student.uid}_${selectedCategory}_${selectedSubCategory}`;
+    const status = draftAttendance[key]; // ✅ correct key
 
-    setSummary({
-      totalStudents: total,
-      presentToday: present,
-      absentToday: absent,
-    });
-  }, [filteredStudents, draftAttendance]);
+    if (status === "present") present++;
+    if (status === "absent") absent++;
+  });
+
+  setSummary({
+    totalStudents: total,
+    presentToday: present,
+    absentToday: absent,
+  });
+}, [filteredStudents, draftAttendance, selectedCategory, selectedSubCategory]);
 
   // Pagination
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);

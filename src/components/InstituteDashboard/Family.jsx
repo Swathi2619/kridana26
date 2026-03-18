@@ -182,15 +182,18 @@ const CreateFamilyPage = () => {
         <input
           placeholder="Father Name"
           value={formData.fatherName}
-         onChange={(e) => {
-  const value = e.target.value;
+onChange={(e) => {
+  let value = e.target.value.replace(/[^A-Za-z.\s]/g, ""); // ✅ allow dot
 
-  if (/^[A-Za-z\s]*$/.test(value)) {
-    setFormData({
-      ...formData,
-      fatherName: value,
-    });
-  }
+  // Capitalize each word
+  value = value
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
+  setFormData({
+    ...formData,
+    fatherName: value,
+  });
 }}
           className="border p-3 rounded"
         />
@@ -199,14 +202,17 @@ const CreateFamilyPage = () => {
           placeholder="Mother Name"
           value={formData.motherName}
 onChange={(e) => {
-  const value = e.target.value;
+  let value = e.target.value.replace(/[^A-Za-z.\s]/g, ""); // ✅ allow dot
 
-  if (/^[A-Za-z\s]*$/.test(value)) {
-    setFormData({
-      ...formData,
-      motherName: value,
-    });
-  }
+  // Capitalize each word
+  value = value
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
+  setFormData({
+    ...formData,
+    motherName: value,
+  });
 }}
           className="border p-3 rounded"
         />
