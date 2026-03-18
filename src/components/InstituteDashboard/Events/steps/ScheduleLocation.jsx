@@ -12,17 +12,12 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
   const auth = getAuth();
 
   const handleChange = (field, value) => {
-    // ❌ reject invalid year like 222222
-    if (value && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return;
-    }
-
     setFormData((prev) => ({
       ...prev,
       schedule: {
         ...prev.schedule,
         [field]: value,
-      },  
+      },
     }));
   };
 
@@ -101,7 +96,7 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
             type="date"
             className={inputStyle}
             min="1900-01-01"
-            max="2099-12-31"
+            max="9999-12-31"
             value={formData?.schedule?.startDate || ""}
             onChange={(e) => handleChange("startDate", e.target.value)}
           />
@@ -114,7 +109,7 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
             type="date"
             className={inputStyle}
             min="1900-01-01"
-            max="2099-12-31"
+            max="9999-12-31"
             value={formData?.schedule?.endDate || ""}
             onChange={(e) => handleChange("endDate", e.target.value)}
           />
@@ -128,8 +123,16 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
             className={inputStyle}
             value={formData?.schedule?.startTime || ""}
             onChange={(e) => {
-              handleChange("startTime", e.target.value);
-              e.target.blur(); // 🔥 closes time picker automatically
+              const value = e.target.value;
+
+              handleChange("startTime", value);
+
+              // close only after hour + minutes selected
+              if (value && value.length === 5) {
+                setTimeout(() => {
+                  e.target.blur();
+                }, 200);
+              }
             }}
           />
         </div>
@@ -142,12 +145,16 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
             className={inputStyle}
             value={formData?.schedule?.endTime || ""}
             onChange={(e) => {
-              handleChange("endTime", e.target.value);
+              const value = e.target.value;
 
-              // close picker after selection
-              setTimeout(() => {
-                e.target.blur();
-              }, 200);
+              handleChange("endTime", value);
+
+              // close only after full time selected
+              if (value && value.length === 5) {
+                setTimeout(() => {
+                  e.target.blur();
+                }, 200);
+              }
             }}
           />
         </div>
@@ -161,7 +168,7 @@ const ScheduleLocation = ({ formData, setFormData, step, setStep }) => {
             type="date"
             className={inputStyle}
             min="1900-01-01"
-            max="2099-12-31"
+            max="9999-12-31"
             value={formData?.schedule?.registrationDeadline || ""}
             onChange={(e) =>
               handleChange("registrationDeadline", e.target.value)
