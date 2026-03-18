@@ -19,11 +19,15 @@ const Feedback = () => {
     const { name, value } = e.target;
 
     // Full name: allow only letters and spaces
-    if (name === "name") {
-      const filtered = value.replace(/[^A-Za-z\s]/g, "");
-      setForm((prev) => ({ ...prev, name: filtered }));
-      return;
-    }
+if (name === "name") {
+  let filtered = value
+    .replace(/[^A-Za-z.\s]/g, "") // ✅ allow dot
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize words
+
+  setForm((prev) => ({ ...prev, name: filtered }));
+  return;
+}
 
     // Phone: allow only digits and max 10
     if (name === "phone") {

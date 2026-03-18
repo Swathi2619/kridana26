@@ -201,8 +201,13 @@ export default function TrainerDetailsPage() {
   </a>
 )}
 
-{trainer.email && (
-  <a href={`mailto:${trainer.email}`} className="btn-outline">
+{trainer.email && trainer.email.includes("@") && (
+  <a
+    href={`https://mail.google.com/mail/?view=cm&fs=1&to=${trainer.email.trim()}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="btn-outline flex items-center gap-2"
+  >
     <img src="/email-icon.png" className="w-4 h-4" alt="email" />
     Email
   </a>

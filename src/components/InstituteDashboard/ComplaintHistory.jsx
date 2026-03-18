@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-
-const ComplaintHistory = ({ ticketId }) => {
+import { useNavigate } from "react-router-dom";
+const ComplaintHistory = ({ ticketId, setActiveMenu }) => {
   const [ticket, setTicket] = useState(null);
   const [status, setStatus] = useState("");
 const [resolvedDate, setResolvedDate] = useState("");
-
+const navigate = useNavigate();
 useEffect(() => {
   if (!ticketId) return;   // ✅ prevent error
 
@@ -42,8 +42,17 @@ useEffect(() => {
   if (!ticket) return <p>Loading...</p>;
 
  return (
-  <div className="p-6 flex justify-center mt-6">
+  <div className="p-6 mt-6">
 
+    {/* 🔙 BACK BUTTON */}
+    <button
+    onClick={() => setActiveMenu("Dashboard")}
+      className="mb-4 flex items-center gap-2 text-orange-600 font-semibold hover:gap-3 transition-all"
+    >
+      ← Back
+    </button>
+
+    <div className="flex justify-center">
     <div className="bg-white shadow-lg rounded-lg w-full max-w-3xl p-6">
 
       {/* HEADER */}
@@ -105,7 +114,7 @@ useEffect(() => {
       </div>
 
     </div>
-
+</div>
   </div>
 );
 };

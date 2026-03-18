@@ -46,7 +46,7 @@ const Footer = ({ darkMode }) => {
               onClick={scrollToTop}
               className="hover:text-[#DB6A2E] text-[#5D3A09]"
             >
-              Visit Help Center
+              Visit Help Centre
             </Link>
 
             <Link

@@ -219,8 +219,13 @@ markAllSeen={() => {
         return <Family />;
       case "Payment & Subscription":
         return <PaymentsSubscriptionPage />;
-    case "Complaint History":
-  return <ComplaintHistory ticketId={selectedTicket} />;
+  case "Complaint History":
+  return (
+    <ComplaintHistory
+      ticketId={selectedTicket}
+      setActiveMenu={setActiveMenu}   // ✅ ADD THIS
+    />
+  );
       default:
         return (
           <div className="text-black">

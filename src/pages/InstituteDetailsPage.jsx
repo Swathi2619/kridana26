@@ -184,10 +184,17 @@ export default function InstituteDetailsPage() {
   </button>
 )}
 
-<a href={`mailto:${inst.email}`} className="btn-outline">
-  <img src="/email-icon.png" className="w-4 h-4" alt="email" />
-  Email
-</a>
+{inst.email && inst.email.includes("@") && (
+  <a
+    href={`https://mail.google.com/mail/?view=cm&fs=1&to=${inst.email.trim()}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="btn-outline"
+  >
+    <img src="/email-icon.png" className="w-4 h-4" alt="email" />
+    Email
+  </a>
+)}
           </div>
         </div>
 

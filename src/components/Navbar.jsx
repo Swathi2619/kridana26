@@ -231,7 +231,7 @@ const Navbar = () => {
               onClick={() => setIsOpen(false)}
               className="block font-medium hover:text-orange-600"
             >
-              Help Center
+              Help Centre
             </NavLink>
             {/* SERVICES */}
             <div className="relative" ref={servicesRef}>

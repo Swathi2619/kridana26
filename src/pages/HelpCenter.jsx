@@ -111,10 +111,14 @@ const HelpCenter = () => {
                   name="fullName"
                   required
                   value={formData.fullName}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/[^A-Za-z.\s]/g, "");
-                    setFormData({ ...formData, fullName: value });
-                  }}
+onChange={(e) => {
+  let value = e.target.value
+    .replace(/[^A-Za-z.\s]/g, "") // allow only letters
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize each word
+
+  setFormData({ ...formData, fullName: value });
+}}
                   className="w-full mt-2 p-3 border border-orange-400 rounded-md outline-none"
                 />
               </div>

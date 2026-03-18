@@ -32,7 +32,10 @@ export default function Career() {
       alert("Please fill all required fields");
       return;
     }
-
+    if (contactNo.length !== 10) {
+      alert("Contact number must be exactly 10 digits");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -143,10 +146,18 @@ export default function Career() {
                 type="text"
                 placeholder="Full Name *"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+onChange={(e) => {
+  let value = e.target.value
+    .replace(/[^A-Za-z.\s]/g, "")     // allow letters + dot + space
+    .replace(/\s+/g, " ")             // remove extra spaces
+    .replace(/\.(?=\S)/g, ". ")       // add space after dot if missing
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize
+
+  setName(value);
+}}
                 className="w-full border rounded-lg px-4 py-2"
               />
-
               <input
                 type="email"
                 placeholder="Email *"
@@ -159,7 +170,13 @@ export default function Career() {
                 type="tel"
                 placeholder="Contact Number *"
                 value={contactNo}
-                onChange={(e) => setContactNo(e.target.value)}
+                maxLength={10}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/\D/g, ""); // ✅ only numbers
+                  value = value.slice(0, 10); // ✅ max 10 digits
+
+                  setContactNo(value);
+                }}
                 className="w-full border rounded-lg px-4 py-2"
               />
 
@@ -191,11 +208,10 @@ export default function Career() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`px-8 py-2 rounded-full text-white ${
-                    loading
+                  className={`px-8 py-2 rounded-full text-white ${loading
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-[#fb923c] hover:bg-[#ea580c]"
-                  }`}
+                    }`}
                 >
                   {loading ? "Submitting..." : "Submit Application"}
                 </button>
