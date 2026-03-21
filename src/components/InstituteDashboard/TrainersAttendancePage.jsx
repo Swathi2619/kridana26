@@ -11,11 +11,9 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../context/AuthContext";
-import { updateDoc } from "firebase/firestore";
-import { ChevronDown } from "lucide-react";
-
-
-
+import { updateDoc, getDocs } from "firebase/firestore";
+import * as XLSX from "xlsx";
+import { ChevronDown, Download } from "lucide-react";
 const absenceReasons = [
   "On Leave",
   "Not Working Day",
@@ -105,13 +103,104 @@ const EmployeeAttendancePage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [selectedDate, setSelectedDate] = useState("");
-
+ const [selectedDate, setSelectedDate] = useState(
+  new Date().toISOString().split("T")[0]
+);
+const [showExportModal, setShowExportModal] = useState(false);
+const [exportFromDate, setExportFromDate] = useState("");
+const [exportToDate, setExportToDate] = useState("");
   const [draftAttendance, setDraftAttendance] = useState({});
-
-
-
   const [search, setSearch] = useState("");
+  const exportAttendanceRange = async () => {
+  if (!exportFromDate || !exportToDate) {
+    alert("Select From and To dates");
+    return;
+  }
+
+const q = query(
+  collection(db, "employeeAttendance"),
+  where("instituteId", "==", user.uid)
+);
+
+const snap = await getDocs(q);
+
+  const attendanceMap = {};
+
+  snap.forEach((doc) => {
+    const data = doc.data();
+
+    if (
+      data.instituteId === user.uid &&
+      data.date >= exportFromDate &&
+      data.date <= exportToDate
+    ) {
+      const key = `${data.employeeId}_${data.date}`;
+
+      attendanceMap[key] = {
+        status: data.status,
+        reason: data.reason || "",
+      };
+    }
+  });
+
+  const attendanceRows = [];
+  const summaryRows = [];
+
+  filteredEmployees.forEach((emp) => {
+    let currentDate = new Date(exportFromDate);
+    const endDate = new Date(exportToDate);
+
+    let present = 0;
+    let total = 0;
+
+while (currentDate <= endDate) {
+  const dateStr = currentDate.toISOString().split("T")[0]; // ✅ FIX
+
+  const key = `${emp.uid}_${dateStr}`; // ✅ FIX
+
+  const record = attendanceMap[key] || {};
+  const status = record.status || "Not Marked";
+  const reason = record.reason || "";
+
+  if (status === "present") present++;
+  if (status !== "Not Marked") total++;
+
+  attendanceRows.push({
+    Name: `${emp.firstName} ${emp.lastName}`,
+    Date: dateStr,
+    Designation: emp.designation || "-",
+    Status: status,
+    Reason: status === "absent" ? reason : "",
+  });
+
+  currentDate.setDate(currentDate.getDate() + 1);
+}
+
+    const percent = total ? ((present / total) * 100).toFixed(1) : 0;
+
+    summaryRows.push({
+      Name: `${emp.firstName} ${emp.lastName}`,
+      Present: present,
+      TotalMarkedDays: total,
+      AttendancePercentage: `${percent}%`,
+    });
+  });
+
+  const workbook = XLSX.utils.book_new();
+
+  const attendanceSheet = XLSX.utils.json_to_sheet(attendanceRows);
+  const summarySheet = XLSX.utils.json_to_sheet(summaryRows);
+
+  XLSX.utils.book_append_sheet(workbook, attendanceSheet, "Attendance");
+  XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
+
+  XLSX.writeFile(
+    workbook,
+    `employee_attendance_${exportFromDate}_to_${exportToDate}.xlsx`
+  );
+
+  setShowExportModal(false);
+};
   const [editData, setEditData] = useState({
     firstName: "",
     lastName: "",
@@ -272,44 +361,52 @@ const filteredEmployees = useMemo(() => {
         </div>
 
       </div>
-      <div className="mb-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+<div className="mb-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
 
-<div className="relative w-full lg:w-80">
-  {/* Search Icon */}
-  <img
-    src="/search-icon.png"
-    alt="search"
-    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-60"
-  />
+  {/* LEFT → SEARCH */}
+  <div className="relative w-full lg:w-80">
+    <img
+      src="/search-icon.png"
+      alt="search"
+      className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-60"
+    />
 
-  {/* Input */}
-  <input
-    type="text"
-    placeholder="Search here..."
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    className="border border-orange-400 rounded-md px-10 py-2 w-full 
-               focus:outline-none focus:ring-0 focus:border-orange-400"
-  />
+    <input
+      type="text"
+      placeholder="Search here..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="border border-orange-400 rounded-md px-10 py-2 w-full 
+                 focus:outline-none focus:ring-0 focus:border-orange-400"
+    />
+  </div>
+
+  {/* RIGHT → BUTTONS */}
+  <div className="flex gap-3 ml-auto">
+    <button
+      onClick={handleAdd}
+      className="bg-orange-500 text-white px-4 py-2 rounded-md"
+    >
+      + Add
+    </button>
+
+    <button
+      onClick={handleEdit}
+      className="border border-orange-500 text-orange-500 px-4 py-2 rounded-md"
+    >
+      Edit
+    </button>
+
+<button
+  onClick={() => setShowExportModal(true)}
+  className="border border-orange-400 px-4 py-2 rounded-md flex items-center gap-2"
+>
+  <Download size={18} />
+  Export
+</button>
+  </div>
+
 </div>
-
-        {/* right → buttons */}
-        <div className="flex gap-3">
-          <button
-            onClick={handleAdd}
-            className="bg-orange-500 text-white px-4 py-2 rounded-md"
-          >
-            + Add
-          </button>
-
-          <button
-            onClick={handleEdit}
-            className="border border-orange-500 text-orange-500 px-4 py-2 rounded-md"
-          >
-            Edit
-          </button>
-        </div>
-      </div>
 
       {/* TABLE */}
       <div className="border-2 border-orange-300 rounded-md overflow-x-auto">
@@ -498,6 +595,49 @@ onChange={(e) =>
                 className="bg-orange-500 text-white px-4 py-2 rounded"
               >
                 Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+            {showExportModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[350px] space-y-4">
+            <h2 className="text-lg font-semibold">Export Attendance</h2>
+
+            <div>
+              <label className="text-sm font-medium">From Date</label>
+              <input
+                type="date"
+                value={exportFromDate}
+                onChange={(e) => setExportFromDate(e.target.value)}
+                className="w-full border border-orange-300 rounded-lg px-3 py-2 mt-1"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">To Date</label>
+              <input
+                type="date"
+                value={exportToDate}
+                onChange={(e) => setExportToDate(e.target.value)}
+                className="w-full border border-orange-300 rounded-lg px-3 py-2 mt-1"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="border px-4 py-1 rounded"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={exportAttendanceRange}
+                className="bg-orange-500 text-white px-4 py-1 rounded"
+              >
+                Download
               </button>
             </div>
           </div>

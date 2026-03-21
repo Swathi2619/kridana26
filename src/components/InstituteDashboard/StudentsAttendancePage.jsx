@@ -15,7 +15,13 @@ import { Pagination } from "./shared";
 import { Search, Download, ChevronDown } from "lucide-react";
 import * as XLSX from "xlsx";
 const today = new Date().toISOString().split("T")[0];
-
+const absenceReasons = [
+  "On Leave",
+  "Not Working Day",
+  "Week Off",
+  "Sick Leave",
+  "Other",
+];
 const TIME_SLOTS = [
   { value: "09:00", label: "09:00 AM" },
   { value: "10:00", label: "10:00 AM" },
@@ -116,7 +122,10 @@ setStudents(list);
           (!selectedSubCategory || data.subCategory === selectedSubCategory)
         ) {
           const key = `${data.studentId}_${data.category}_${data.subCategory}`;
-          map[key] = data.status;
+    map[key] = {
+  status: data.status,
+  reason: data.reason || "",
+};
         }
       });
 
@@ -184,7 +193,7 @@ useEffect(() => {
 
   filteredStudents.forEach((student) => {
     const key = `${student.uid}_${selectedCategory}_${selectedSubCategory}`;
-    const status = draftAttendance[key]; // ✅ correct key
+  const status = draftAttendance[key]?.status;
 
     if (status === "present") present++;
     if (status === "absent") absent++;
@@ -206,14 +215,17 @@ useEffect(() => {
   }, [filteredStudents, currentPage]);
 
   // Save Attendance
-  const saveAttendance = (student, status) => {
-    const key = `${student.uid}_${selectedCategory}_${selectedSubCategory}`;
+const saveAttendance = (student, status, reason = "") => {
+  const key = `${student.uid}_${selectedCategory}_${selectedSubCategory}`;
 
-    setDraftAttendance((prev) => ({
-      ...prev,
-      [key]: status,
-    }));
-  };
+  setDraftAttendance((prev) => ({
+    ...prev,
+    [key]: {
+      status,
+      reason,
+    },
+  }));
+};
   const categories = useMemo(() => {
     const set = new Set();
 
@@ -254,12 +266,20 @@ useEffect(() => {
     return Array.from(set);
   }, [students]);
   const handleSaveAll = async () => {
+    for (const rec of Object.values(draftAttendance)) {
+  if (rec?.status === "absent" && !rec?.reason) {
+    alert("Please select reason for all absent students");
+    return;
+  }
+}
     const dayName = getDayName(selectedDate);
 
     const promises = Object.entries(draftAttendance).map(([key, status]) => {
       const [studentId] = key.split("_");
 
       const student = students.find((s) => s.uid === studentId);
+
+ 
 
       return setDoc(
         doc(
@@ -278,7 +298,8 @@ useEffect(() => {
           date: selectedDate,
           day: dayName,
           time: selectedTime || "",
-          status,
+         status: status.status,
+reason: status.reason || "",
           updatedAt: serverTimestamp(),
           createdAt: serverTimestamp(),
         },
@@ -307,6 +328,7 @@ useEffect(() => {
 
   // Export CSV
   const exportAttendanceRange = async () => {
+    console.log("Download clicked");
     if (!exportFromDate || !exportToDate) {
       alert("Select From and To dates");
       return;
@@ -322,7 +344,10 @@ useEffect(() => {
 
       if (data.date >= exportFromDate && data.date <= exportToDate) {
         const key = `${data.studentId}_${data.date}`;
-        attendanceMap[key] = data.status;
+       attendanceMap[key] = {
+  status: data.status,
+  reason: data.reason || "",
+};
       }
     });
 
@@ -340,17 +365,19 @@ useEffect(() => {
         const dateStr = currentDate.toISOString().split("T")[0];
         const key = `${student.uid}_${dateStr}`;
 
-        const status = attendanceMap[key] || "Not Marked";
+     const record = attendanceMap[key];
+const status = record?.status || "Not Marked";
 
         if (status === "present") present++;
         if (status !== "Not Marked") total++;
 
-        attendanceRows.push({
-          Name: `${student.firstName} ${student.lastName}`,
-          Date: dateStr,
-          Session: student.sessions || "-",
-          Status: status,
-        });
+       attendanceRows.push({
+  Name: `${student.firstName} ${student.lastName}`,
+  Date: dateStr,
+  Session: student.sessions || "-",
+  Status: status,
+  Reason: record?.reason || "",   // ✅ ADD THIS LINE
+}); 
 
         currentDate.setDate(currentDate.getDate() + 1);
       }
@@ -578,11 +605,12 @@ useEffect(() => {
 
       {/* TABLE */}
       <div className="border border-orange-300 rounded-xl overflow-hidden">
-        <div className="hidden md:grid grid-cols-4 bg-[#1F2937] text-orange-400 font-semibold p-4">
+        <div className="hidden md:grid grid-cols-5 bg-[#1F2937] text-orange-400 font-semibold p-4">
           <div>Students Name</div>
           <div>Session</div>
           <div className="text-center">Present</div>
           <div className="text-center">Absent</div>
+          <div className="text-center">Reason</div> 
         </div>
 
         <div className="bg-white min-h-[300px]">
@@ -593,7 +621,7 @@ useEffect(() => {
             return (
               <div
                 key={s.uid}
-                className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-0 p-4 border-t items-center"
+                className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-0 p-4 border-t items-center"
               >
                 <div className="flex items-center gap-3">
                   <div className="mr-1 text-gray-500 font-semibold">
@@ -610,8 +638,8 @@ useEffect(() => {
                 <div className="flex justify-center">
                   <input
                     type="checkbox"
-                    checked={record === "present"}
-                    onChange={() => saveAttendance(s, "present")}
+                   checked={record?.status === "present"}
+                  onChange={() => saveAttendance(s, "present", "")}
                     className="w-5 h-5"
                   />
                 </div>
@@ -619,11 +647,29 @@ useEffect(() => {
                 <div className="flex justify-center">
                   <input
                     type="checkbox"
-                    checked={record === "absent"}
+                   checked={record?.status === "absent"}
                     onChange={() => saveAttendance(s, "absent")}
                     className="w-5 h-5"
                   />
                 </div>
+                <div className="flex justify-center">
+  {record?.status === "absent" && (
+    <select
+      value={record?.reason || ""}
+      onChange={(e) =>
+        saveAttendance(s, "absent", e.target.value)
+      }
+      className="border rounded px-2 py-1"
+    >
+      <option value="">Select</option>
+      {absenceReasons.map((r) => (
+        <option key={r} value={r}>
+          {r}
+        </option>
+      ))}
+    </select>
+  )}
+</div>
               </div>
             );
           })}

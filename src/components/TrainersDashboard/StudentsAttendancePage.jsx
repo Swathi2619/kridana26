@@ -17,6 +17,7 @@ import * as XLSX from "xlsx";
 
 const today = new Date().toISOString().split("T")[0];
 
+
 const TIME_SLOTS = [
   { value: "09:00", label: "09:00 AM" },
   { value: "10:00", label: "10:00 AM" },
@@ -44,7 +45,7 @@ const getDayName = (dateStr) => {
 const StudentsAttendancePage = () => {
   const [selectedTime, setSelectedTime] = useState("");
   const timeRef = useRef(null);
-
+const [absenceReasons, setAbsenceReasons] = useState({});
   const { user, institute } = useAuth(); // user = trainer now
 const [showExportModal, setShowExportModal] = useState(false);
 const [exportFromDate, setExportFromDate] = useState("");
@@ -146,6 +147,12 @@ const [exportToDate, setExportToDate] = useState("");
 
         if (matchDate && matchCategory && matchSub) {
           map[data.studentId] = data.status;
+          if (data.reason) {
+  setAbsenceReasons((prev) => ({
+    ...prev,
+    [data.studentId]: data.reason,
+  }));
+}
         }
       });
 
@@ -155,6 +162,16 @@ const [exportToDate, setExportToDate] = useState("");
 
     fetchData();
   }, [user, selectedDate, selectedCategory, selectedSubCategory]);
+
+
+
+  const ABSENCE_OPTIONS = [
+  "On Leave",
+  "Not Working Day",
+  "Week Off",
+  "Sick Leave",
+  "Other",
+];
 
   // ==============================
   // FILTER STUDENTS (JOIN + LEFT LOGIC)
@@ -241,15 +258,30 @@ const [exportToDate, setExportToDate] = useState("");
   // ==============================
   // SAVE ATTENDANCE (TRAINER)
   // ==============================
-  const saveAttendance = (student, status) => {
-    setDraftAttendance((prev) => ({
-      ...prev,
-      [student.uid]: status,
-    }));
-  };
+const saveAttendance = (student, status) => {
+  setDraftAttendance((prev) => ({
+    ...prev,
+    [student.uid]: status,
+  }));
+
+  // if switching to present → remove reason
+  if (status === "present") {
+    setAbsenceReasons((prev) => {
+      const copy = { ...prev };
+      delete copy[student.uid];
+      return copy;
+    });
+  }
+};
 
   const handleSaveAll = async () => {
     const dayName = getDayName(selectedDate);
+        for (let [studentId, status] of Object.entries(draftAttendance)) {
+  if (status === "absent" && !absenceReasons[studentId]) {
+    alert("Please enter reason for all absent students ❌");
+    return;
+  }
+}
 
     const promises = Object.entries(draftAttendance).map(
       ([studentId, status]) => {
@@ -275,6 +307,7 @@ const [exportToDate, setExportToDate] = useState("");
             day: dayName,
             time: selectedTime || "",
             status,
+            reason: absenceReasons[studentId] || "",
             updatedAt: serverTimestamp(),
             createdAt: serverTimestamp(),
           },
@@ -314,7 +347,10 @@ const exportAttendanceRange = async () => {
 
     if (data.date >= exportFromDate && data.date <= exportToDate) {
       const key = `${data.studentId}_${data.date}`;
-      attendanceMap[key] = data.status;
+     attendanceMap[key] = {
+  status: data.status,
+  reason: data.reason || "",
+};
     }
   });
 
@@ -332,17 +368,20 @@ const exportAttendanceRange = async () => {
       const dateStr = currentDate.toISOString().split("T")[0];
       const key = `${student.uid}_${dateStr}`;
 
-      const status = attendanceMap[key] || "Not Marked";
+     const record = attendanceMap[key] || {};
+const status = record.status || "Not Marked";
+const reason = record.reason || "";
 
       if (status === "present") present++;
       if (status !== "Not Marked") total++;
 
-      attendanceRows.push({
-        Name: `${student.firstName} ${student.lastName}`,
-        Date: dateStr,
-        Session: student.sessions || "-",
-        Status: status,
-      });
+attendanceRows.push({
+  Name: `${student.firstName} ${student.lastName}`,
+  Date: dateStr,
+  Session: student.sessions || "-",
+  Status: status,
+  Reason: status === "absent" ? reason : "",
+});
 
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -532,11 +571,12 @@ const exportAttendanceRange = async () => {
 
       {/* TABLE */}
       <div className="border border-orange-300 rounded-xl overflow-hidden">
-        <div className="hidden md:grid grid-cols-4 bg-[#1F2937] text-orange-400 font-semibold p-4">
+        <div className="hidden md:grid grid-cols-5 bg-[#1F2937] text-orange-400 font-semibold p-4">
           <div>Students Name</div>
           <div>Session</div>
           <div className="text-center">Present</div>
           <div className="text-center">Absent</div>
+          <div className="text-center">Reason</div>
         </div>
 
         <div className="bg-white min-h-[300px]">
@@ -546,7 +586,7 @@ const exportAttendanceRange = async () => {
             return (
               <div
                 key={s.uid}
-                className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-0 p-4 border-t items-center"
+                className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-0 p-4 border-t items-center"
               >
                 <div className="flex items-center gap-3">
                   <div className="mr-1 text-gray-500 font-semibold">
@@ -577,6 +617,27 @@ const exportAttendanceRange = async () => {
                     className="w-5 h-5"
                   />
                 </div>
+<div className="flex justify-center">
+  {record === "absent" && (
+    <select
+      value={absenceReasons[s.uid] || ""}
+      onChange={(e) =>
+        setAbsenceReasons((prev) => ({
+          ...prev,
+          [s.uid]: e.target.value,
+        }))
+      }
+      className="border border-orange-300 rounded px-2 py-1"
+    >
+      <option value="">Select</option>
+      {ABSENCE_OPTIONS.map((r) => (
+        <option key={r} value={r}>
+          {r}
+        </option>
+      ))}
+    </select>
+  )}
+</div>
               </div>
             );
           })}
@@ -654,4 +715,4 @@ const exportAttendanceRange = async () => {
   );
 };
 
-export default StudentsAttendancePage
+export default StudentsAttendancePage;

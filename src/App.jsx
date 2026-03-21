@@ -12,6 +12,7 @@ import TrainerSignup from "./pages/TrainerSignup.jsx";
 import InstituteSignup from "./pages/InstituteSignup.jsx";
 import Login from "./pages/Login.jsx";
 import Landing from "./pages/Landing.jsx";
+import BookPlayTime from "./pages/BookPlayTime.jsx";
 
 /* ================= NAVBAR ================= */
 import Navbar from "./components/Navbar.jsx";
@@ -112,6 +113,7 @@ function App() {
                 <Route path="/chat/:chatId" element={<ChatBox />} />
                 <Route path="/feedback" element={<Feedback />} />
                 <Route path="/help-center" element={<HelpCenter />} />
+                <Route path="/book-play" element={<BookPlayTime />} />
 
                 {/* LANDING */}
                 <Route path="/RoleSelection" element={<RoleSelection />} />
