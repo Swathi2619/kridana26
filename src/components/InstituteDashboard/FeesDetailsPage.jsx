@@ -215,11 +215,13 @@ setStudents(list);
         f.month === `${selectedYear}-${selectedMonth}`,
     );
 
-    setEditData({
-      totalFee: sport.fee || 0,
-      paidAmount: existingFee?.paidAmount || "",
-      paidDate: existingFee?.paidDate || "",
-    });
+setEditData({
+  totalFee: existingFee?.totalAmount ?? sport.fee ?? 0,
+  paidAmount: existingFee?.paidAmount ?? "",
+  paidDate: existingFee?.paidDate ?? "",
+  feeWaived: existingFee?.feeWaived || false,
+  waiveReason: existingFee?.waiveReason || "",
+});
 
     setShowEditModal(true);
   };

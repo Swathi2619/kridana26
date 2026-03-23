@@ -12,7 +12,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function BookPlayTime() {
   const { user } = useAuth();
@@ -95,7 +95,7 @@ export default function BookPlayTime() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200 p-3 sm:p-6">
+    <div className="min-h-screen flex items-center justify-center bg-white p-3 sm:p-6">
       <div className="w-full max-w-5xl border-2 border-orange-400 p-4 sm:p-6 md:p-8 bg-white rounded-xl shadow-lg">
 
         <div className="text-center mb-6">
@@ -196,9 +196,8 @@ export default function BookPlayTime() {
                 className="w-full border border-orange-300 rounded-md p-2 mt-1"
               >
                 <option value="">Select</option>
-                <option>UPI</option>
-                <option>Card</option>
-                <option>Cash</option>
+                <option>Online</option>
+                <option>Offline</option>
               </select>
             </div>
 

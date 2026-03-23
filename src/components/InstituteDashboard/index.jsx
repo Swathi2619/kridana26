@@ -40,6 +40,8 @@ import EventsSidebar from "./Events/EventsSidebar";
 import MyAccountPage from "./MyAccountPage";
 import Family from "./Family";
 import ComplaintHistory from "./ComplaintHistory";
+import BookingDetails from "./BookingDetails";
+import BookingFacilities from "./BookingFacilities";
 const sidebarItems = [
   "Dashboard",
   "Customers Attendance",
@@ -51,6 +53,8 @@ const sidebarItems = [
   "Management Attendance",
   "Management Details",
   "Salary Details",
+  "Booking Details",
+  "Booking Facilities",
   "Time Table",
   "Add Events",
   "Analytics",
@@ -193,6 +197,10 @@ markAllSeen={() => {
         return <AddStudentDetailsPage />;
      case "Add Events":
   return <EventsPage setActiveMenu={setActiveMenu} />;
+  case "Booking Details":
+  return <BookingDetails />;
+  case "Booking Facilities":
+  return <BookingFacilities />;
       case "Sell Sports Material":
         return <SellSportsMaterial setActiveMenu={setActiveMenu} />;
       case "Upload Product Details":
